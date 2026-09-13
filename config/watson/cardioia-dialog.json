@@ -17,10 +17,7 @@
       "enabled": true
     },
     "spelling_suggestions": true,
-    "spelling_auto_correct": false,
-    "off_topic": {
-      "enabled": true
-    }
+    "spelling_auto_correct": false
   },
   "intents": [
     {

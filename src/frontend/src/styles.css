@@ -205,7 +205,7 @@ button:disabled {
   box-shadow: 0 0 0 3px rgba(232, 183, 99, 0.14);
 }
 
-.status-pill--online .status-pill__dot {
+.status-pill--ready .status-pill__dot {
   background: #72d5a6;
   box-shadow: 0 0 0 3px rgba(114, 213, 166, 0.14);
 }
@@ -218,6 +218,10 @@ button:disabled {
 
 .status-pill--checking .status-pill__dot {
   animation: statusPulse 1.4s ease-in-out infinite;
+}
+
+.status-pill__label--short {
+  display: none;
 }
 
 .new-chat-button {
@@ -400,13 +404,13 @@ button:disabled {
   justify-content: space-between;
   gap: 18px;
   margin-bottom: 5px;
-  color: #708788;
+  color: #526a6b;
   font-size: 0.68rem;
   font-weight: 600;
 }
 
 .message-row--user .message-meta {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .message-bubble p {
@@ -611,7 +615,7 @@ button:disabled {
 }
 
 .composer textarea::placeholder {
-  color: #8ba09f;
+  color: #526a6b;
 }
 
 .composer textarea:disabled {
@@ -648,13 +652,13 @@ button:disabled {
   justify-content: space-between;
   gap: 12px;
   padding: 7px 3px 0;
-  color: #849796;
+  color: #526a6b;
   font-size: 0.66rem;
 }
 
 kbd {
   padding: 1px 4px;
-  color: #617978;
+  color: #526a6b;
   background: #eff4f2;
   border: 1px solid #d9e3e0;
   border-radius: 4px;
@@ -708,7 +712,7 @@ kbd {
 
 .nlp-panel__title small {
   margin-top: 2px;
-  color: #849796;
+  color: #526a6b;
   font-size: 0.63rem;
   font-weight: 500;
 }
@@ -757,7 +761,7 @@ kbd {
 .nlp-empty p {
   max-width: 190px;
   margin: 0 auto;
-  color: #809392;
+  color: #526a6b;
   font-size: 0.75rem;
   line-height: 1.45;
 }
@@ -778,7 +782,7 @@ kbd {
 .nlp-stats dt,
 .entity-section h3 {
   margin: 0;
-  color: #829594;
+  color: #526a6b;
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -880,7 +884,7 @@ kbd {
 
 .entity-empty {
   margin: 10px 0 0;
-  color: #849796;
+  color: #526a6b;
   font-size: 0.7rem;
   line-height: 1.4;
 }
@@ -912,13 +916,13 @@ kbd {
   gap: 12px;
   padding-top: 14px;
   margin-top: 18px;
-  color: #8a9c9b;
+  color: #526a6b;
   border-top: 1px solid #e9efed;
   font-size: 0.63rem;
 }
 
 .session-info code {
-  color: #657e7d;
+  color: #526a6b;
   font-size: 0.64rem;
 }
 
@@ -927,7 +931,7 @@ kbd {
   min-height: 66px;
   align-items: center;
   gap: 9px;
-  color: #6f8584;
+  color: #526a6b;
   border-top: 1px solid rgba(208, 222, 218, 0.85);
   font-size: 0.7rem;
 }
@@ -968,7 +972,7 @@ kbd {
 
   .nlp-panel {
     position: static;
-    grid-row: 1;
+    grid-row: auto;
   }
 
   .nlp-panel__content {
@@ -1030,9 +1034,26 @@ kbd {
   }
 
   .brand__tagline,
-  .status-pill,
-  .new-chat-button span {
+  .new-chat-button span,
+  .status-pill__label--full {
     display: none;
+  }
+
+  .topbar__actions {
+    gap: 8px;
+  }
+
+  .status-pill {
+    height: 32px;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 9px;
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .status-pill__label--short {
+    display: inline;
   }
 
   .new-chat-button {
@@ -1074,9 +1095,15 @@ kbd {
   }
 
   .privacy-note {
-    width: 18px;
-    overflow: hidden;
-    white-space: nowrap;
+    gap: 0;
+  }
+
+  .privacy-note svg {
+    flex: 0 0 auto;
+  }
+
+  .privacy-note span {
+    display: none;
   }
 
   .transcript {

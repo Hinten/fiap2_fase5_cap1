@@ -83,7 +83,7 @@ O processamento de linguagem natural utiliza uma **Dialog Skill do IBM Watson As
 </p>
 
 > [!NOTE]
-> As capturas registram o estado inicial real com **Serviço disponível**. Para não expor dados pessoais nem transformar uma conversa clínica em conteúdo público, as imagens não contêm mensagens de teste; os cenários verificados no smoke test estão descritos na seção [Testes e qualidade](#qualidade).
+> As capturas registram o estado inicial real com **Configuração pronta** no desktop e **Pronto** no mobile. Para não expor dados pessoais nem transformar uma conversa clínica em conteúdo público, as imagens não contêm mensagens de teste; os cenários verificados no smoke test estão descritos na seção [Testes e qualidade](#qualidade).
 
 <a id="aderencia"></a>
 
@@ -99,12 +99,12 @@ O processamento de linguagem natural utiliza uma **Dialog Skill do IBM Watson As
 | Backend Python | [`src/backend`](src/backend) | **Disponível** |
 | Export do assistente | [`cardioia-dialog.json`](config/watson/cardioia-dialog.json) | **Disponível** |
 | Relatório curto | [PDF](output/pdf/relatorio-cardioia.pdf) · [fonte em Markdown](document/relatorio-cardioia.md) | **Disponível — 2 páginas** |
-| Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; deve ser publicado antes da entrega |
+| Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; avaliador previamente convidado |
 | Vídeo de até 3 minutos | [Roteiro da demonstração](document/roteiro-video.md) | **Pendente de gravação e publicação** |
 | Grupo de 4 a 5 integrantes — 1 ponto extra | Grupo 7 com cinco integrantes identificados acima | **Atende à formação recomendada** |
 
 > [!WARNING]
-> Para atender integralmente ao enunciado antes da entrega, ainda é necessário publicar o vídeo e tornar o repositório acessível ao avaliador. O PDF preserva um registro anterior de 33 testes; a execução atual, documentada abaixo, possui 42 testes aprovados. Os desafios opcionais “Ir Além” não fazem parte do escopo desta versão.
+> Antes da entrega, ainda é necessário gravar e publicar o vídeo. O repositório permanece privado por decisão do grupo, com o avaliador previamente convidado, e o relatório PDF já registra a integração real e os 42 testes aprovados. Os desafios opcionais “Ir Além” não fazem parte do escopo desta versão.
 
 <a id="como-funciona"></a>
 
@@ -134,7 +134,7 @@ A ordem do diálogo é:
 flowchart LR
     U[Usuário] -->|mensagem| R[React + Vite]
     R -->|POST /api/chat| F[API Flask]
-    F -->|API V1 ou V2| W[IBM Watson Assistant]
+    F -->|API V1 · Classic/Lite| W[IBM Watson Assistant]
     W -->|texto + NLP| F
     F -->|resposta normalizada| R
 
@@ -313,14 +313,18 @@ pnpm --dir src/frontend build
 
 Resultado local verificado em 13/09/2026: **42 testes aprovados com Python 3.14.0**, lint aprovado com ESLint 10.10.0 e build de produção aprovado com Vite 8.3.0. A suíte cobre o contrato da API, validações, contexto e sessões, normalização das respostas e estrutura da Dialog Skill.
 
-O smoke test real foi concluído em 13/09/2026 com uma instância IBM Watson Assistant Classic/Lite, Dialog Skill **CardioIA Acolhe** e API V1. Foram verificados pela API Flask e pela interface React:
+O smoke test real foi concluído em 13/09/2026 com uma instância IBM Watson Assistant Classic/Lite, Dialog Skill **CardioIA Acolhe** e API V1. A jornada React → Flask → Watson verificou explicitamente:
 
-- fluxo normal em três turnos, preservando sintoma, intensidade e duração no contexto;
-- reconhecimento de intensidade numérica com `@sys-number` e geração do resumo;
-- sinal de alerta direto, retornando `urgent: true` e orientação de emergência;
-- fallback para pergunta fora do escopo;
-- reinício da sessão;
-- visualização responsiva em viewport mobile.
+1. estado de carregamento (`loading`) durante a requisição;
+2. envio da mensagem pelo botão;
+3. envio da mensagem pela tecla Enter;
+4. apresentação de erro seguro, sem HTML interpretado, credenciais, stack trace ou detalhes internos;
+5. reset por **Nova conversa**, descartando o contexto anterior;
+6. sinal de alerta com `urgent: true` e orientação de emergência;
+7. exibição dos detalhes de NLP: intent, confiança e entidades;
+8. fluxo normal em três turnos, preservando sintoma, intensidade (`@sys-number`) e duração até o resumo;
+9. fallback para pergunta fora do escopo;
+10. responsividade na viewport de 390 × 844 px.
 
 Todos os cenários empregaram exclusivamente frases fictícias, sem dados pessoais.
 
