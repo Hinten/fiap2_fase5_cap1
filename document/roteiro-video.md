@@ -1,7 +1,10 @@
 # Roteiro de vídeo — CardioIA Acolhe
 
-**Duração-alvo:** 2min35s (faixa aceita: 2min20s a 2min50s)  
-**Link do vídeo:** **PENDENTE — inserir pelo usuário após a gravação.**
+**Duração-alvo:** 2min32s (timeline total: 0:00–2:32)
+
+**Status da gravação:** **PENDENTE.**
+
+**Link do vídeo:** **PENDENTE — inserir pelo usuário após a gravação, sem URL provisória.**
 
 > Use apenas dados fictícios durante a demonstração. Deixe o navegador com zoom legível, feche notificações e confirme que nenhuma credencial ou arquivo `.env` está visível.
 
@@ -74,7 +77,7 @@
 
 ## Checklist antes de publicar
 
-- [ ] O vídeo tem entre 2min20s e 2min50s.
+- [ ] A gravação acompanha a timeline e termina em 2min32s, dentro do limite de até 3 minutos.
 - [ ] Nenhuma chave, `.env`, e-mail, notificação ou dado pessoal aparece na gravação.
 - [ ] Os três cenários usam exatamente dados fictícios.
 - [ ] A fala sobre testes corresponde aos resultados efetivamente mostrados.

@@ -127,6 +127,16 @@ def styles():
     )
     sheet.add(
         ParagraphStyle(
+            name="TableBody",
+            parent=sheet["BodyText"],
+            fontName=FONT,
+            fontSize=7.2,
+            leading=9.5,
+            textColor=INK,
+        )
+    )
+    sheet.add(
+        ParagraphStyle(
             name="Callout",
             parent=sheet["BodyText"],
             fontName=FONT_BOLD,
@@ -247,12 +257,12 @@ def on_page(canvas, doc):
     canvas.line(18 * mm, 13 * mm, width - 18 * mm, 13 * mm)
     canvas.setFillColor(MUTED)
     canvas.setFont(FONT, 6.7)
-    canvas.drawString(18 * mm, 8.5 * mm, "Grupo 7 · Fase 5 — Capítulo 1 · 12/09/2026")
+    canvas.drawString(18 * mm, 8.5 * mm, "Grupo 7 · Fase 5 - Capítulo 1 · 13/09/2026")
     canvas.drawRightString(width - 18 * mm, 8.5 * mm, f"{doc.page}/2")
     canvas.restoreState()
 
 
-def build_report(output: Path, watson_status: str, video_status: str) -> None:
+def build_report(output: Path, video_status: str) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     style = styles()
     doc = SimpleDocTemplate(
@@ -262,8 +272,8 @@ def build_report(output: Path, watson_status: str, video_status: str) -> None:
         leftMargin=18 * mm,
         topMargin=19 * mm,
         bottomMargin=17 * mm,
-        title="CardioIA Acolhe — Relatório técnico",
-        author="Grupo 7 — FIAP",
+        title="CardioIA Acolhe - Relatório técnico",
+        author="Grupo 7 - FIAP",
         subject="Assistente cardiológico educativo com IBM Watson Assistant",
     )
 
@@ -299,7 +309,9 @@ def build_report(output: Path, watson_status: str, video_status: str) -> None:
         architecture_drawing(),
         Paragraph(
             "O React renderiza texto de forma segura e usa a API na mesma origem. O Flask valida entradas, oculta credenciais, "
-            "normaliza a resposta e usa API V1 Classic/Lite ou V2 quando disponível. Na V1, o contexto é efêmero (TTL de 30 min e até 500 conversas). A Dialog Skill concentra as decisões; nenhum modelo generativo participa do fluxo.",
+            "normaliza a resposta e usa a API V1 do IBM Watson Assistant Classic/Lite, configurada em 13/09/2026. "
+            "O backend preserva compatibilidade com a V2. Na V1, o contexto é efêmero (TTL de 30 min e até 500 conversas). "
+            "A Dialog Skill concentra as decisões; nenhum modelo generativo participa do fluxo.",
             style["BodyCompact"],
         ),
         make_table(
@@ -307,14 +319,15 @@ def build_report(output: Path, watson_status: str, video_status: str) -> None:
                 ["Camada", "Responsabilidade", "Evidência no repositório"],
                 ["Interface", "Histórico, sugestões, Enter/botão, loading, erros, reset, alerta e painel NLP.", "src/frontend"],
                 ["API", "Health, chat e reset; V1/V2; limites; códigos 400/502/503; contexto efêmero.", "src/backend"],
-                ["NLU", "7 intents, 3 entidades com sinônimos, @sys-number, contexto e fallback.", "config/watson"],
+                ["NLU", "Dialog Skill CardioIA Acolhe: 7 intents, 4 entidades e 14 nós.", "config/watson"],
             ],
             [25 * mm, 92 * mm, 44 * mm],
         ),
         Paragraph("Modelagem NLU e fluxo", style["Section"]),
         Paragraph(
-            "Intents: <b>#saudacao, #relatar_sintoma, #sinal_alerta, #preparar_consulta, #limites_assistente, #agradecimento</b> e <b>#despedida</b> (7–8 exemplos cada). "
-            "Entidades: <b>@sintoma, @intensidade, @confirmacao</b> e <b>@sys-number</b>. Contexto: <b>$sintoma, $intensidade, $duracao</b>. Dor no peito ou falta de ar com valor a partir de 7/10 aciona o alerta prioritário.",
+            "Intents: <b>#saudacao, #relatar_sintoma, #sinal_alerta, #preparar_consulta, #limites_assistente, #agradecimento</b> e <b>#despedida</b> (7-8 exemplos cada). "
+            "Entidades: <b>@sintoma, @intensidade, @confirmacao</b> e <b>@sys-number</b>. A skill possui <b>14 nós</b> e usa o contexto "
+            "<b>$sintoma, $intensidade e $duracao</b>. Dor no peito ou falta de ar com valor a partir de 7/10 aciona o alerta prioritário.",
             style["BodyCompact"],
         ),
         make_table(
@@ -366,33 +379,60 @@ def build_report(output: Path, watson_status: str, video_status: str) -> None:
         make_table(
             [
                 ["Verificação", "Resultado"],
-                ["Backend + export Watson", "42/42 testes pytest aprovados em Python 3.14"],
-                ["Frontend", "ESLint aprovado; build de produção Vite 8.3 aprovado"],
-                ["React → Flask (sem credencial)", "Health, build servido e falha 503 segura conferidos no Chrome"],
-                ["React → Flask → Watson", watson_status],
+                ["Automação", "42/42 testes pytest, ESLint e build Vite 8.3 aprovados"],
+                ["IBM Watson", Paragraph("Classic/Lite API V1 configurada em 13/09/2026; skill com 7 intents, 4 entidades e 14 nós", style["TableBody"])],
+                ["Integração real", "Flask → Watson e React → Flask → Watson aprovados em 13/09/2026"],
                 ["Roteiro e vídeo", video_status],
             ],
             [67 * mm, 94 * mm],
         ),
+        Paragraph("Smoke real - evidências verificadas", style["Section"]),
+        make_table(
+            [
+                [
+                    Paragraph("<b>1.</b> Loading durante a requisição", style["Small"]),
+                    Paragraph("<b>6.</b> Alerta com urgent: true e orientação de emergência", style["Small"]),
+                ],
+                [
+                    Paragraph("<b>2.</b> Envio da mensagem pelo botão", style["Small"]),
+                    Paragraph("<b>7.</b> Detalhes NLP: intent, confiança e entidades", style["Small"]),
+                ],
+                [
+                    Paragraph("<b>3.</b> Envio da mensagem pela tecla Enter", style["Small"]),
+                    Paragraph("<b>8.</b> Fluxo normal em 3 turnos, contexto e resumo", style["Small"]),
+                ],
+                [
+                    Paragraph("<b>4.</b> Erro seguro, sem HTML, credenciais ou detalhes internos", style["Small"]),
+                    Paragraph("<b>9.</b> Fallback para pergunta fora do escopo", style["Small"]),
+                ],
+                [
+                    Paragraph("<b>5.</b> Reset por Nova conversa, descartando o contexto", style["Small"]),
+                    Paragraph("<b>10.</b> Responsividade na viewport 390 x 844 px", style["Small"]),
+                ],
+            ],
+            [80.5 * mm, 80.5 * mm],
+            header=False,
+            font_size=7.1,
+            paddings=(4, 3),
+        ),
         Paragraph("Entregáveis e reprodutibilidade", style["Section"]),
         Paragraph(
             "O repositório contém export importável da Dialog Skill, API Flask testável por injeção, interface React/Vite, lockfile pnpm, CI, suíte automatizada, relatório-fonte e roteiro de 2min32s. "
-            "As instruções do README reproduzem desenvolvimento, build integrado e smoke test. O repositório permanece privado por decisão do grupo, com o avaliador previamente convidado.",
+            "As instruções do README reproduzem desenvolvimento, build integrado e smoke test. O repositório permanece privado como exceção consciente ao enunciado; o avaliador foi previamente convidado, sem compromisso de publicação.",
             style["BodyCompact"],
         ),
-        Paragraph("Grupo 7", style["Section"]),
+        Paragraph("Autoria", style["Section"]),
         Paragraph(
-            "Alice C. M. Assis — RM 566233  ·  Leonardo S. Souza — RM 563928  ·  Lucas B. Francelino — RM 561409  ·  "
-            "Pedro L. T. Silva — RM 561644  ·  Vitor A. Bezerra — RM 563001<br/>"
-            "Coordenação: André Godoi Chiovato. Grupo com cinco integrantes; ponto adicional registrado separadamente.",
+            "Trabalho acadêmico do Grupo 7 - FIAP, Fase 5, Capítulo 1. "
+            "Dados pessoais e identificadores foram omitidos deste relatório técnico.",
             style["Small"],
         ),
         Paragraph("Referências", style["Section"]),
         Paragraph(
-            "IBM — <link href='https://cloud.ibm.com/docs/watson-assistant?topic=watson-assistant-skill-dialog-add' color='#0B706F'>Dialog Skills</link> e "
+            "IBM - <link href='https://cloud.ibm.com/docs/watson-assistant?topic=watson-assistant-skill-dialog-add' color='#0B706F'>Dialog Skills</link> e "
             "<link href='https://cloud.ibm.com/docs/watson-assistant?topic=watson-assistant-api-overview' color='#0B706F'>APIs</link> e "
             "<link href='https://cloud.ibm.com/docs/watson-assistant?topic=watson-assistant-admin-securing' color='#0B706F'>segurança</link>. "
-            "Ministério da Saúde — <link href='https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/i/infarto' color='#0B706F'>Infarto</link> e "
+            "Ministério da Saúde - <link href='https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/i/infarto' color='#0B706F'>Infarto</link> e "
             "<link href='https://www.gov.br/saude/pt-br/composicao/saes/samu-192' color='#0B706F'>SAMU 192</link>. "
             "Código e documentação: README do projeto.",
             style["Small"],
@@ -406,10 +446,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument(
-        "--watson-status",
-        default="Pendente: configuração acompanhada no plano Lite e smoke test real",
-    )
-    parser.add_argument(
         "--video-status",
         default="Roteiro de 2min32s pronto; gravação e link pendentes do usuário",
     )
@@ -418,5 +454,5 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     arguments = parse_args()
-    build_report(arguments.output.resolve(), arguments.watson_status, arguments.video_status)
+    build_report(arguments.output.resolve(), arguments.video_status)
     print(arguments.output.resolve())

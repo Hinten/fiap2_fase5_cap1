@@ -6,13 +6,13 @@ Este documento registra bloqueios, decisões e evidências que exigem acompanham
 
 | Item | Estado | Ação necessária | Responsável |
 |---|---|---|---|
-| Configuração do IBM Watson Assistant | Pendente | Criar o terceiro assistant, importar a Dialog Skill e executar smoke test com o usuário acompanhando. | Equipe + usuário |
-| Credenciais locais | Pendente | Preencher `.env` localmente; nunca enviar pelo chat ou versionar. | Usuário |
+| Configuração do IBM Watson Assistant | Concluído | Assistant **CardioIA Acolhe** e Dialog Skill configurados no IBM Watson Assistant Classic/Lite; integração pela API V1 validada em 13/09/2026. | Equipe |
+| Credenciais locais | Concluído | Credenciais usadas somente no ambiente local de validação, sem envio pelo chat ou versionamento. | Usuário |
 | PDF do relatório | Concluído | PDF A4 de 2 páginas gerado e ambas as páginas verificadas visualmente. | Equipe |
 | Vídeo | Pendente | Gravar, publicar e inserir o link no README e no roteiro. | Usuário |
-| Testes locais | Concluído | 42 testes Python, lint e build aprovados em 12/09/2026. | Equipe |
-| Smoke test final | Pendente | Validar React → Flask → Watson após configurar a IBM. | Equipe + usuário |
-| Avaliação independente | Pendente | Obter nota do subagente e aplicar feedback, até 10/10 ou três ciclos. | Equipe |
+| Testes locais | Concluído | 42 testes Python, lint e build aprovados em 13/09/2026. | Equipe |
+| Smoke test final | Concluído | Jornada real React → Flask → Watson aprovada em 13/09/2026: `loading`, envio por botão e Enter, erro seguro, reset, alerta com `urgent`, detalhes de NLP, fluxo normal em 3 turnos, fallback e viewport 390 × 844. | Equipe |
+| Avaliação independente | Em andamento | Avaliação 1 concluída e achados documentais incorporados nesta revisão; repetir a avaliação até 10/10 ou três ciclos. | Equipe |
 
 ## Restrições confirmadas
 
@@ -20,7 +20,7 @@ Este documento registra bloqueios, decisões e evidências que exigem acompanham
 - Não alterar os dois assistants existentes na conta.
 - Não armazenar dados reais nem registrar o texto das conversas.
 - Não apresentar o protótipo como ferramenta de diagnóstico ou prescrição.
-- Manter o repositório privado, conforme decisão do usuário, garantindo acesso prévio do avaliador.
+- Manter o repositório privado como exceção consciente ao enunciado; o avaliador foi previamente convidado e não há compromisso de tornar o repositório público.
 
 ## Modelo de ocorrência
 

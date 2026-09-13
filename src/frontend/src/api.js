@@ -1,5 +1,15 @@
 const DEFAULT_ERROR = 'Não foi possível falar com o assistente agora. Tente novamente em instantes.'
 
+export class ApiError extends Error {
+  constructor(message, { kind, status = null, code = null, cause } = {}) {
+    super(message, { cause })
+    this.name = 'ApiError'
+    this.kind = kind
+    this.status = status
+    this.code = code
+  }
+}
+
 async function readResponse(response) {
   const contentType = response.headers.get('content-type') ?? ''
 
@@ -45,16 +55,20 @@ async function request(path, options = {}) {
     })
   } catch (error) {
     if (error?.name === 'AbortError') throw error
-    throw new Error(
+    throw new ApiError(
       'Não foi possível conectar ao servidor. Verifique se o Flask está em execução.',
-      { cause: error },
+      { kind: 'network', code: 'network_error', cause: error },
     )
   }
 
   const payload = await readResponse(response)
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(response, payload))
+    throw new ApiError(getErrorMessage(response, payload), {
+      kind: 'http',
+      status: response.status,
+      code: payload?.error?.code ?? null,
+    })
   }
 
   return payload

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { getHealth, resetConversation, sendChatMessage } from './api.js'
+import { ApiError, getHealth, resetConversation, sendChatMessage } from './api.js'
 
 const MAX_MESSAGE_LENGTH = 500
 
@@ -98,14 +98,18 @@ function normalizeEntities(entities) {
 }
 
 function isWatsonConfigured(payload) {
-  const explicitValue =
-    payload?.watsonConfigured ??
-    payload?.watson_configured ??
-    payload?.configured ??
-    payload?.watson?.configured
+  return payload?.status === 'ok' && payload?.watson?.configured === true
+}
 
-  if (typeof explicitValue === 'boolean') return explicitValue
-  return payload?.status === 'ok' || payload?.status === 'healthy'
+function healthStateFromRequestError(error) {
+  if (!(error instanceof ApiError)) return null
+  if (error.status === 503 || error.code === 'watson_not_configured') return 'setup'
+  if (
+    error.kind === 'network' ||
+    error.status === 502 ||
+    error.code === 'watson_unavailable'
+  ) return 'offline'
+  return null
 }
 
 function Icon({ name, size = 20 }) {
@@ -185,16 +189,26 @@ function Icon({ name, size = 20 }) {
 
 function StatusPill({ health }) {
   const copy = {
-    checking: 'Verificando serviço',
-    online: 'Serviço disponível',
-    setup: 'Watson não configurado',
-    offline: 'Servidor indisponível',
+    checking: { full: 'Verificando configuração', short: 'Verificando' },
+    ready: { full: 'Configuração pronta', short: 'Pronto' },
+    setup: { full: 'Configuração pendente', short: 'Pendente' },
+    offline: { full: 'Conexão degradada', short: 'Offline' },
   }
+  const label = copy[health] ?? copy.checking
 
   return (
-    <div className={`status-pill status-pill--${health}`} role="status" aria-live="polite">
+    <div
+      className={`status-pill status-pill--${health}`}
+      role="status"
+      aria-label={label.full}
+      aria-live="polite"
+      title={label.full}
+    >
       <span className="status-pill__dot" aria-hidden="true" />
-      <span>{copy[health]}</span>
+      <span className="status-pill__label status-pill__label--full">{label.full}</span>
+      <span className="status-pill__label status-pill__label--short" aria-hidden="true">
+        {label.short}
+      </span>
     </div>
   )
 }
@@ -386,7 +400,8 @@ export default function App() {
   const [error, setError] = useState(null)
   const [failedMessage, setFailedMessage] = useState(null)
   const [detailsExpanded, setDetailsExpanded] = useState(true)
-  const transcriptEndRef = useRef(null)
+  const transcriptRef = useRef(null)
+  const previousMessageCountRef = useRef(messages.length)
   const inputRef = useRef(null)
 
   const lastAnalysis = useMemo(() => {
@@ -405,17 +420,24 @@ export default function App() {
     const controller = new AbortController()
 
     getHealth({ signal: controller.signal })
-      .then((payload) => setHealth(isWatsonConfigured(payload) ? 'online' : 'setup'))
+      .then((payload) => setHealth(isWatsonConfigured(payload) ? 'ready' : 'setup'))
       .catch((requestError) => {
-        if (requestError.name !== 'AbortError') setHealth('offline')
+        if (requestError.name === 'AbortError') return
+        setHealth(healthStateFromRequestError(requestError) ?? 'offline')
       })
 
     return () => controller.abort()
   }, [])
 
   useEffect(() => {
-    transcriptEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  }, [messages, isSending, error])
+    const messageCountChanged = previousMessageCountRef.current !== messages.length
+    previousMessageCountRef.current = messages.length
+
+    if (!messageCountChanged && !isSending && !error) return
+
+    const transcript = transcriptRef.current
+    transcript?.scrollTo({ top: transcript.scrollHeight, behavior: 'smooth' })
+  }, [messages.length, isSending, error])
 
   useEffect(() => {
     const textarea = inputRef.current
@@ -457,11 +479,12 @@ export default function App() {
         ...current,
         makeMessage('assistant', reply, { urgent: analysis.urgent, analysis }),
       ])
-      setHealth('online')
+      setHealth('ready')
     } catch (requestError) {
       setError(requestError.message)
       setFailedMessage(cleanMessage)
-      if (requestError.message.includes('configurado')) setHealth('setup')
+      const nextHealth = healthStateFromRequestError(requestError)
+      if (nextHealth) setHealth(nextHealth)
     } finally {
       setIsSending(false)
       window.setTimeout(() => inputRef.current?.focus(), 0)
@@ -492,6 +515,8 @@ export default function App() {
       if (currentConversationId) await resetConversation(currentConversationId)
     } catch (requestError) {
       setError(`A conversa foi limpa neste dispositivo. ${requestError.message}`)
+      const nextHealth = healthStateFromRequestError(requestError)
+      if (nextHealth) setHealth(nextHealth)
     } finally {
       setConversationId(null)
       setMessages(initialMessages())
@@ -550,13 +575,19 @@ export default function App() {
               <p className="section-kicker">Conversa acolhedora</p>
               <h1 id="conversation-heading">Conte o que você está sentindo</h1>
             </div>
-            <div className="privacy-note">
+            <div className="privacy-note" role="note" aria-label="Não informe dados pessoais">
               <Icon name="shield" size={16} />
-              Não informe dados pessoais
+              <span>Não informe dados pessoais</span>
             </div>
           </div>
 
-          <div className="transcript" role="log" aria-live="polite" aria-relevant="additions">
+          <div
+            className="transcript"
+            ref={transcriptRef}
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+          >
             <ol className="message-list">
               {messages.map((message) => <MessageBubble key={message.id} message={message} />)}
               {!hasUserMessages && (
@@ -579,8 +610,6 @@ export default function App() {
                 )}
               </div>
             )}
-
-            <div ref={transcriptEndRef} />
           </div>
 
           <form className="composer" onSubmit={handleSubmit}>
