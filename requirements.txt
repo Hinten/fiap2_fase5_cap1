@@ -1,0 +1,5 @@
+Flask==3.1.2
+ibm-watson==11.2.0
+python-dotenv==1.2.3
+pytest==8.4.2
+

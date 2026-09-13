@@ -1,0 +1,535 @@
+{
+  "name": "CardioIA Acolhe",
+  "description": "Triagem cardiológica educativa, sem diagnóstico ou prescrição.",
+  "language": "pt-br",
+  "learning_opt_out": true,
+  "metadata": {
+    "api_version": {
+      "major_version": "v1",
+      "minor_version": "2018-09-20"
+    }
+  },
+  "system_settings": {
+    "tooling": {
+      "store_generic_responses": true
+    },
+    "system_entities": {
+      "enabled": true
+    },
+    "spelling_suggestions": true,
+    "spelling_auto_correct": false,
+    "off_topic": {
+      "enabled": true
+    }
+  },
+  "intents": [
+    {
+      "intent": "saudacao",
+      "description": "Inicia uma conversa.",
+      "examples": [
+        {"text": "Olá"},
+        {"text": "Oi, tudo bem?"},
+        {"text": "Bom dia"},
+        {"text": "Boa tarde"},
+        {"text": "Boa noite"},
+        {"text": "Quero começar"},
+        {"text": "Pode me ajudar?"}
+      ]
+    },
+    {
+      "intent": "relatar_sintoma",
+      "description": "Relata um sintoma cardiovascular sem sinal explícito de emergência.",
+      "examples": [
+        {"text": "Estou com palpitações"},
+        {"text": "Sinto uma dor leve no peito"},
+        {"text": "Tenho sentido tontura"},
+        {"text": "Meu coração está acelerado"},
+        {"text": "Estou com um pouco de falta de ar"},
+        {"text": "Senti enjoo junto com desconforto no peito"},
+        {"text": "Quero contar um sintoma"},
+        {"text": "Tenho cansaço ao subir escadas"}
+      ]
+    },
+    {
+      "intent": "sinal_alerta",
+      "description": "Relata um sinal que exige orientação imediata de emergência.",
+      "examples": [
+        {"text": "Estou com dor muito forte no peito"},
+        {"text": "Desmaiei e estou passando mal"},
+        {"text": "Estou com falta de ar intensa"},
+        {"text": "Sinto aperto no peito e suor frio"},
+        {"text": "A dor no peito está insuportável"},
+        {"text": "Não consigo respirar direito"},
+        {"text": "Estou quase desmaiando com dor no peito"},
+        {"text": "Tenho dor no peito, náusea e suor frio"}
+      ]
+    },
+    {
+      "intent": "preparar_consulta",
+      "description": "Pede ajuda para organizar uma consulta médica.",
+      "examples": [
+        {"text": "Como me preparo para a consulta?"},
+        {"text": "O que devo contar ao cardiologista?"},
+        {"text": "O que preciso levar ao médico?"},
+        {"text": "Quero organizar minhas informações para a consulta"},
+        {"text": "Que perguntas faço na consulta?"},
+        {"text": "Como registrar meus sintomas?"},
+        {"text": "Pode criar uma lista para falar com o médico?"}
+      ]
+    },
+    {
+      "intent": "limites_assistente",
+      "description": "Pergunta sobre capacidade, diagnóstico ou prescrição.",
+      "examples": [
+        {"text": "Você pode dar um diagnóstico?"},
+        {"text": "Que remédio devo tomar?"},
+        {"text": "Você substitui um cardiologista?"},
+        {"text": "Isso é uma consulta médica?"},
+        {"text": "Pode receitar alguma coisa?"},
+        {"text": "Você sabe qual doença eu tenho?"},
+        {"text": "Até onde você consegue me orientar?"}
+      ]
+    },
+    {
+      "intent": "agradecimento",
+      "description": "Agradece a orientação recebida.",
+      "examples": [
+        {"text": "Obrigado"},
+        {"text": "Muito obrigada"},
+        {"text": "Valeu pela ajuda"},
+        {"text": "Agradeço a orientação"},
+        {"text": "Você ajudou bastante"},
+        {"text": "Entendi, obrigado"},
+        {"text": "Grato pelas informações"}
+      ]
+    },
+    {
+      "intent": "despedida",
+      "description": "Encerra a conversa.",
+      "examples": [
+        {"text": "Tchau"},
+        {"text": "Até mais"},
+        {"text": "Pode encerrar"},
+        {"text": "Finalizar conversa"},
+        {"text": "Até logo"},
+        {"text": "Por hoje é só"},
+        {"text": "Não preciso de mais nada"}
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "entity": "sintoma",
+      "description": "Sintomas relevantes para a orientação cardiológica educativa.",
+      "fuzzy_match": true,
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "dor_no_peito",
+          "synonyms": ["dor no peito", "dor torácica", "aperto no peito", "pressão no peito", "desconforto no peito"]
+        },
+        {
+          "type": "synonyms",
+          "value": "falta_de_ar",
+          "synonyms": ["falta de ar", "respiração curta", "dificuldade para respirar", "sem ar", "não consigo respirar"]
+        },
+        {
+          "type": "synonyms",
+          "value": "palpitacao",
+          "synonyms": ["palpitação", "palpitações", "coração acelerado", "coração disparado", "batimento irregular"]
+        },
+        {
+          "type": "synonyms",
+          "value": "tontura",
+          "synonyms": ["cabeça girando", "sensação de desequilíbrio", "vertigem"]
+        },
+        {
+          "type": "synonyms",
+          "value": "desmaio",
+          "synonyms": ["desmaiei", "perdi a consciência", "quase desmaiei", "quase desmaiando"]
+        },
+        {
+          "type": "synonyms",
+          "value": "suor_frio",
+          "synonyms": ["suor frio", "suando frio", "sudorese fria"]
+        },
+        {
+          "type": "synonyms",
+          "value": "nausea",
+          "synonyms": ["náusea", "enjoo", "vontade de vomitar"]
+        },
+        {
+          "type": "synonyms",
+          "value": "cansaco",
+          "synonyms": ["cansaço", "fadiga", "muito cansado", "cansada ao esforço"]
+        }
+      ]
+    },
+    {
+      "entity": "intensidade",
+      "description": "Percepção qualitativa da intensidade do sintoma.",
+      "fuzzy_match": true,
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "leve",
+          "synonyms": ["fraca", "fraco", "pequena", "pouco"]
+        },
+        {
+          "type": "synonyms",
+          "value": "moderada",
+          "synonyms": ["moderado", "média", "médio", "razoável"]
+        },
+        {
+          "type": "synonyms",
+          "value": "intensa",
+          "synonyms": ["intenso", "forte", "muito forte", "importante", "insuportável", "grave"]
+        }
+      ]
+    },
+    {
+      "entity": "confirmacao",
+      "description": "Respostas afirmativas e negativas.",
+      "fuzzy_match": true,
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "sim",
+          "synonyms": ["claro", "correto", "isso", "confirmo", "pode ser"]
+        },
+        {
+          "type": "synonyms",
+          "value": "nao",
+          "synonyms": ["não", "negativo", "não é isso", "de jeito nenhum"]
+        }
+      ]
+    },
+    {
+      "entity": "sys-number",
+      "description": "Entidade de sistema habilitada para reconhecer intensidades numéricas.",
+      "values": []
+    }
+  ],
+  "counterexamples": [
+    {"text": "Qual é a previsão do tempo?"},
+    {"text": "Conte uma piada"},
+    {"text": "Quero comprar um celular"},
+    {"text": "Quem ganhou o jogo?"},
+    {"text": "Toque uma música"}
+  ],
+  "dialog_nodes": [
+    {
+      "dialog_node": "node_emergencia",
+      "title": "1. Emergência — prioridade máxima",
+      "description": "Intercepta sinais explícitos antes de qualquer coleta.",
+      "conditions": "#sinal_alerta || @sintoma:desmaio || @sintoma:suor_frio || (((@sintoma:dor_no_peito || @sintoma:falta_de_ar) || ($sintoma == 'dor_no_peito' || $sintoma == 'falta_de_ar')) && (@intensidade:intensa || (@sys-number && @sys-number.numeric_value >= 7)))",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "ATENÇÃO: os sinais relatados podem exigir atendimento imediato. Procure um serviço de emergência agora ou ligue para o SAMU pelo 192. Se possível, peça ajuda a alguém próximo. Não dirija e não espere a conversa continuar. Este assistente não realiza diagnóstico."
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": true,
+        "sintoma": "<? @sintoma ?>",
+        "intensidade": "<? @intensidade ?>",
+        "duracao": null,
+        "etapa": "emergencia"
+      }
+    },
+    {
+      "dialog_node": "node_boas_vindas",
+      "title": "2. Boas-vindas",
+      "conditions": "welcome",
+      "previous_sibling": "node_emergencia",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "Olá! Eu sou o CardioIA Acolhe. Posso ajudar a organizar informações sobre sintomas e preparar uma conversa com um profissional de saúde. Não faço diagnóstico nem indico medicamentos. Se houver dor forte no peito, falta de ar intensa, suor frio ou desmaio, procure emergência ou ligue 192. O que você está sentindo?"
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "sintoma": null,
+        "intensidade": null,
+        "duracao": null,
+        "etapa": "aguardando_sintoma"
+      }
+    },
+    {
+      "dialog_node": "node_saudacao",
+      "title": "3. Saudação",
+      "conditions": "#saudacao",
+      "previous_sibling": "node_boas_vindas",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Olá! Vou ajudar você a organizar o relato, sem substituir avaliação médica. Qual sintoma você está sentindo?"}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "sintoma": null,
+        "intensidade": null,
+        "duracao": null,
+        "etapa": "aguardando_sintoma"
+      }
+    },
+    {
+      "dialog_node": "node_sintoma_informado",
+      "title": "4. Coleta — sintoma já reconhecido",
+      "conditions": "#relatar_sintoma && @sintoma",
+      "previous_sibling": "node_saudacao",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Entendi. Em uma escala de 0 a 10, qual é a intensidade desse sintoma agora?"}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "sintoma": "<? @sintoma ?>",
+        "intensidade": null,
+        "duracao": null,
+        "etapa": "aguardando_intensidade"
+      }
+    },
+    {
+      "dialog_node": "node_pedir_sintoma",
+      "title": "5. Coleta — pedir sintoma",
+      "conditions": "#relatar_sintoma",
+      "previous_sibling": "node_sintoma_informado",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Qual é o principal sintoma? Por exemplo: dor no peito, falta de ar, palpitação, tontura ou cansaço."}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "sintoma": null,
+        "intensidade": null,
+        "duracao": null,
+        "etapa": "aguardando_sintoma"
+      }
+    },
+    {
+      "dialog_node": "node_capturar_sintoma",
+      "title": "6. Coleta — capturar sintoma em contexto",
+      "conditions": "($etapa == null || $etapa == 'aguardando_sintoma') && @sintoma",
+      "previous_sibling": "node_pedir_sintoma",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Certo. Em uma escala de 0 a 10, qual é a intensidade desse sintoma agora?"}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "sintoma": "<? @sintoma ?>",
+        "intensidade": null,
+        "duracao": null,
+        "etapa": "aguardando_intensidade"
+      }
+    },
+    {
+      "dialog_node": "node_capturar_intensidade",
+      "title": "7. Coleta — intensidade válida",
+      "conditions": "$etapa == 'aguardando_intensidade' && (@sys-number || @sys-number == 0) && @sys-number.numeric_value >= 0 && @sys-number.numeric_value <= 10",
+      "previous_sibling": "node_capturar_sintoma",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Há quanto tempo o sintoma começou e ele é contínuo ou aparece em episódios?"}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "intensidade": "<? @sys-number.numeric_value ?>",
+        "duracao": null,
+        "etapa": "aguardando_duracao"
+      }
+    },
+    {
+      "dialog_node": "node_repetir_intensidade",
+      "title": "8. Coleta — intensidade inválida",
+      "conditions": "$etapa == 'aguardando_intensidade'",
+      "previous_sibling": "node_capturar_intensidade",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Para eu organizar o relato, responda apenas com um número de 0 a 10 para a intensidade. Se o sintoma for grave ou estiver piorando, procure atendimento imediatamente."}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "etapa": "aguardando_intensidade"
+      }
+    },
+    {
+      "dialog_node": "node_capturar_duracao_resumir",
+      "title": "9. Coleta — duração e resumo",
+      "conditions": "$etapa == 'aguardando_duracao' && input.text.length() > 0",
+      "previous_sibling": "node_repetir_intensidade",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "Resumo para você levar a um profissional: sintoma — $sintoma; intensidade — $intensidade/10; duração/evolução — <? input.text ?>. Anote também o que estava fazendo quando começou, fatores que pioram ou aliviam, medicamentos em uso e doenças anteriores. Este resumo é educativo e não é diagnóstico. Se piorar ou surgirem sinais de alerta, procure emergência ou ligue 192."
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {
+        "urgent": false,
+        "duracao": "<? input.text ?>",
+        "etapa": "concluida"
+      }
+    },
+    {
+      "dialog_node": "node_preparar_consulta",
+      "title": "10. Preparar consulta",
+      "conditions": "#preparar_consulta",
+      "previous_sibling": "node_capturar_duracao_resumir",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "Para a consulta, leve: lista de sintomas com início, duração e intensidade; medicamentos e doses; alergias; doenças e exames anteriores; histórico familiar; e suas dúvidas. Se puder, registre quando o sintoma aparece e o que o melhora ou piora. Não interrompa nem inicie medicamentos sem orientação profissional."
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {"urgent": false}
+    },
+    {
+      "dialog_node": "node_limites",
+      "title": "11. Limites do assistente",
+      "conditions": "#limites_assistente",
+      "previous_sibling": "node_preparar_consulta",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "Eu organizo informações e ofereço orientação educativa. Não diagnostico doenças, não interpreto exames de forma conclusiva, não prescrevo medicamentos e não substituo médico ou serviço de emergência. Para decisões clínicas, procure um profissional habilitado."
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {"urgent": false}
+    },
+    {
+      "dialog_node": "node_agradecimento",
+      "title": "12. Agradecimento",
+      "conditions": "#agradecimento",
+      "previous_sibling": "node_limites",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Por nada! Posso ajudar a registrar outro sintoma ou preparar sua lista para uma consulta."}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {"urgent": false}
+    },
+    {
+      "dialog_node": "node_despedida",
+      "title": "13. Despedida",
+      "conditions": "#despedida",
+      "previous_sibling": "node_agradecimento",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {"text": "Até logo. Cuide-se! Se surgir dor forte no peito, falta de ar intensa, suor frio ou desmaio, procure emergência ou ligue 192."}
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {"urgent": false, "etapa": "encerrada"}
+    },
+    {
+      "dialog_node": "node_fallback",
+      "title": "14. Fallback — sempre por último",
+      "description": "Retoma o escopo sem improvisar uma resposta clínica.",
+      "conditions": "anything_else",
+      "previous_sibling": "node_despedida",
+      "output": {
+        "generic": [
+          {
+            "response_type": "text",
+            "values": [
+              {
+                "text": "Não entendi com segurança. Você pode: relatar um sintoma, dizer 'preparar consulta' ou perguntar sobre meus limites. Em caso de dor forte no peito, falta de ar intensa, suor frio ou desmaio, procure emergência ou ligue 192."
+              }
+            ],
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "context": {"urgent": false}
+    }
+  ]
+}
