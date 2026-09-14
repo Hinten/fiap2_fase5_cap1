@@ -53,6 +53,7 @@
 - [API da aplicação](#api)
 - [Estrutura de pastas](#estrutura)
 - [Configuração do Watson Assistant](#configuracao)
+- [IR ALÉM 1 — extração clínica com IA generativa](#ir-alem-1)
 - [Como executar o código](#execucao)
 - [Testes e qualidade](#qualidade)
 - [Histórico de lançamentos](#historico)
@@ -64,7 +65,9 @@
 
 O **CardioIA Acolhe** é um assistente conversacional educativo que ajuda uma pessoa a organizar informações sobre sintomas cardiológicos antes de procurar atendimento profissional. Em uma conversa curta e determinística, a aplicação identifica o sintoma relatado, pergunta intensidade e duração, preserva as respostas no contexto e devolve um resumo estruturado. Também ajuda o usuário a preparar perguntas e informações para uma consulta.
 
-O processamento de linguagem natural utiliza uma **Dialog Skill do IBM Watson Assistant**, sem IA generativa. A skill em português brasileiro reúne intents, entidades, sinônimos, variáveis de contexto, um nó de emergência prioritário e fallback final. O backend Flask protege as credenciais e normaliza as respostas; a interface web baseada em HTML, React e Vite oferece histórico, sugestões, estados de carregamento e erro, reinício da conversa, alerta de urgência e detalhes de NLP.
+O processamento de linguagem natural do fluxo principal utiliza uma **Dialog Skill do IBM Watson Assistant**, sem IA generativa. A skill em português brasileiro reúne intents, entidades, sinônimos, variáveis de contexto, um nó de emergência prioritário e fallback final. O backend Flask protege as credenciais e normaliza as respostas; a interface web baseada em HTML, React e Vite oferece histórico, sugestões, estados de carregamento e erro, reinício da conversa, alerta de urgência e detalhes de NLP.
+
+Como desafio opcional, o [IR ALÉM 1](#ir-alem-1) adiciona um módulo de **IA generativa** que transforma relatos clínicos em texto livre em JSON estruturado (sintoma, intensidade, duração, contexto, entidades, nível de alerta e confiança), usando system prompt, few-shot, chain-of-thought e JSON mode, com validação e modo de simulação sem chave.
 
 <a id="interface"></a>
 
@@ -102,9 +105,11 @@ O processamento de linguagem natural utiliza uma **Dialog Skill do IBM Watson As
 | Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; avaliador previamente convidado |
 | Vídeo de até 3 minutos | [Roteiro da demonstração](document/roteiro-video.md) | **Pendente de gravação e publicação** |
 | Grupo de 4 a 5 integrantes — 1 ponto extra | Grupo 7 com cinco integrantes identificados acima | **Atende à formação recomendada** |
+| IR ALÉM 1 — código Python | [`clinical_extractor.py`](src/backend/clinical_extractor.py), rotas `/api/extract` e `/api/chat/clinical`, [demo](scripts/demo_clinical_extractor.py), 74 testes e [evidência real com Gemini](document/ir-alem-1-evidencia-llm.json) | **Implementado; execução real verificada em 14/09/2026** |
+| IR ALÉM 1 — documento PDF | [PDF](output/pdf/ir-alem-1-extracao-clinica.pdf) · [fonte em Markdown](document/ir-alem-1-extracao-clinica.md) | **Disponível — 4 páginas** |
 
 > [!WARNING]
-> Antes da entrega, ainda é necessário gravar e publicar o vídeo. O repositório permanece privado por decisão do grupo, com o avaliador previamente convidado, e o relatório PDF já registra a integração real e os 42 testes aprovados. Os desafios opcionais “Ir Além” não fazem parte do escopo desta versão.
+> Antes da entrega, ainda é necessário gravar e publicar o vídeo. O repositório permanece privado por decisão do grupo, com o avaliador previamente convidado, e o relatório PDF já registra a integração real e os testes aprovados. Dos desafios opcionais, o IR ALÉM 1 está entregue; o IR ALÉM 2 não faz parte do escopo desta versão.
 
 <a id="como-funciona"></a>
 
@@ -150,6 +155,8 @@ O frontend nunca acessa o Watson diretamente. O backend atua como fronteira de s
 
 Na V1, o contexto é efêmero e mantido apenas na memória do processo por até 30 minutos, com limite de 500 conversas. Não há banco de dados nem persistência de conversas. As requisições ao Watson incluem opt-out de aprendizagem; ainda assim, a demonstração deve usar somente frases fictícias, sem nomes, documentos, prontuários ou outros dados pessoais.
 
+O módulo do IR ALÉM 1 fica ao lado do gateway, em `src/backend/clinical_extractor.py`. A rota `POST /api/chat/clinical` estrutura a mensagem com o extrator antes de consultar o Watson: um nível `critical` recebe orientação de emergência imediata; nos demais casos o Watson responde e a extração é anexada em `clinical`. Sem `LLM_API_KEY`, o extrator roda em modo de simulação, então o fluxo principal nunca depende de um provedor de IA generativa.
+
 <a id="api"></a>
 
 ## 🔌 API da aplicação
@@ -159,8 +166,10 @@ Na V1, o contexto é efêmero e mantido apenas na memória do processo por até 
 | `GET` | `/api/health` | Informa a saúde da aplicação e a presença da configuração, sem expor segredos. |
 | `POST` | `/api/chat` | Envia `message` e `conversationId`; devolve resposta, conversa, NLP e `urgent`. |
 | `POST` | `/api/reset` | Encerra ou descarta a sessão e reinicia o contexto. |
+| `POST` | `/api/extract` | IR ALÉM 1: recebe `text` (até 2.000 caracteres) e devolve `extraction` em JSON, `model` e `mode`. |
+| `POST` | `/api/chat/clinical` | IR ALÉM 1: mesmo contrato de `/api/chat`, acrescido de `clinical` (extração) e `source` (`watson` ou `clinical`). |
 
-Mensagens vazias ou maiores que 500 caracteres retornam `400`; configuração ausente retorna `503`; indisponibilidade do Watson retorna `502`. Uma sessão V2 expirada é recriada uma única vez.
+Mensagens vazias ou maiores que 500 caracteres retornam `400`; configuração ausente retorna `503`; indisponibilidade do Watson retorna `502`. Uma sessão V2 expirada é recriada uma única vez. Em `/api/extract`, falha do modelo de linguagem retorna `502`; `/api/health` informa `clinical.mode` (`mock` ou `llm`), `clinical.provider` e `clinical.model`.
 
 <details>
 <summary><strong>Exemplo do contrato de chat</strong></summary>
@@ -208,13 +217,13 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 ├── .github/                  # arquivos de apoio à qualidade do repositório
 ├── assets/                   # marca e capturas de tela da documentação
 ├── config/watson/            # export versionado da Dialog Skill
-├── document/                 # relatório técnico e roteiro da demonstração
-├── output/pdf/               # relatório técnico final em PDF
-├── scripts/                  # validação, preparação e geração de entregáveis
+├── document/                 # relatório técnico, documento do IR ALÉM 1 e roteiro da demonstração
+├── output/pdf/               # relatório técnico e documento do IR ALÉM 1 em PDF
+├── scripts/                  # validação, preparação, demo do IR ALÉM 1 e geração de entregáveis
 ├── src/
-│   ├── backend/              # API Flask e gateway do Watson Assistant
+│   ├── backend/              # API Flask, gateway do Watson Assistant e extrator clínico (IR ALÉM 1)
 │   └── frontend/             # interface React/Vite
-├── tests/backend/            # testes da API, gateway e export do Watson
+├── tests/backend/            # testes da API, gateway, export do Watson e extração clínica
 ├── .env.example              # modelo de configuração, sem credenciais
 ├── requirements.txt          # dependências Python
 └── README.md                 # guia geral do projeto
@@ -240,6 +249,44 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 
 > [!CAUTION]
 > Nunca compartilhe nem versione a API key. A configuração do IBM Cloud deve ser realizada com o responsável pelo projeto acompanhando. Não confirme upgrade, plano pago ou complemento faturável.
+
+<a id="ir-alem-1"></a>
+
+## 🧠 IR ALÉM 1 — extração clínica com IA generativa
+
+O módulo [`src/backend/clinical_extractor.py`](src/backend/clinical_extractor.py) transforma um relato em texto livre em JSON estruturado usando uma API **Chat Completions** com **system prompt** (papel, regras e esquema), **few-shot** (quatro exemplos, um por nível de alerta), **chain-of-thought** (seis passos) e **JSON mode**, seguidos de validação de tipos e faixas. A explicação completa do fluxo está no [documento PDF](output/pdf/ir-alem-1-extracao-clinica.pdf) e na [fonte em Markdown](document/ir-alem-1-extracao-clinica.md).
+
+| Modo | Como ativar | Uso |
+|---|---|---|
+| `mock` | Padrão, sem chave | Simulação determinística com o mesmo esquema; usada nos testes, no CI e na demo. |
+| `llm` | `LLM_API_KEY` no `.env` (+ `LLM_BASE_URL` e `LLM_MODEL`) | Extração real com o modelo de linguagem do provedor configurado. |
+
+O código fala o protocolo Chat Completions da OpenAI por meio do SDK `openai`, então **qualquer provedor compatível funciona sem alterar código** — basta trocar as variáveis do `.env`. O **Google Gemini foi usado apenas nos testes e nas evidências deste repositório**, por oferecer free tier sem cartão; não é um requisito do projeto. A execução real foi verificada em 14/09/2026 com `gemini-3.5-flash`: os quatro cenários da demo e as saídas JSON completas estão em [`document/ir-alem-1-evidencia-llm.json`](document/ir-alem-1-evidencia-llm.json) e no PDF.
+
+| Provedor | `LLM_BASE_URL` | `LLM_MODEL` (exemplo) | Chave |
+|---|---|---|---|
+| Google Gemini (usado nos testes) | `https://generativelanguage.googleapis.com/v1beta/openai/` | `gemini-3.5-flash` | [Google AI Studio](https://aistudio.google.com/apikey) — free tier (cerca de 20 requisições/dia por modelo; se esgotar, troque `LLM_MODEL`, por exemplo para `gemini-3.5-flash-lite`) |
+| OpenAI | *(vazio)* | `gpt-4o-mini` | [platform.openai.com](https://platform.openai.com/api-keys) — pré-pago |
+| Groq | `https://api.groq.com/openai/v1` | `llama-3.3-70b-versatile` | [console.groq.com](https://console.groq.com/keys) — free tier |
+| Ollama (local) | `http://localhost:11434/v1` | modelo baixado localmente | qualquer valor não vazio |
+
+```powershell
+python scripts/demo_clinical_extractor.py                    # quatro cenários fictícios no modo mock
+python scripts/demo_clinical_extractor.py --real             # mesmo roteiro com o provedor do .env
+python scripts/demo_clinical_extractor.py --real --list-models   # confere os nomes de modelo disponíveis
+python scripts/demo_clinical_extractor.py --real --save document/ir-alem-1-evidencia-llm.json
+python scripts/generate_ir_alem1_report.py                   # regenera o PDF (usa a evidência acima, se existir)
+```
+
+Exemplo de chamada com a API em execução:
+
+```powershell
+$body = @{ text = "Falta de ar ao subir escadas, uns 10 minutos" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/extract -ContentType "application/json" -Body $body
+```
+
+> [!NOTE]
+> O extrator não diagnostica nem prescreve: apenas organiza o que foi relatado. A orientação de emergência (SAMU 192) é decidida pelo backend a partir do nível de alerta. Nenhum texto clínico, resposta do modelo ou credencial é registrado em log.
 
 <a id="execucao"></a>
 
@@ -271,7 +318,7 @@ python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Preencha o `.env` de acordo com o modo V1 ou V2 descrito acima. Em seguida, inicie a API:
+Preencha o `.env` de acordo com o modo V1 ou V2 descrito acima (e, opcionalmente, o provedor de IA generativa da seção [IR ALÉM 1](#ir-alem-1)). Em seguida, inicie a API:
 
 ```powershell
 python -m src.backend
@@ -311,7 +358,7 @@ pnpm --dir src/frontend lint
 pnpm --dir src/frontend build
 ```
 
-Resultado local verificado em 13/09/2026: **42 testes aprovados com Python 3.14.0**, lint aprovado com ESLint 10.10.0 e build de produção aprovado com Vite 8.3.0. A suíte cobre o contrato da API, validações, contexto e sessões, normalização das respostas e estrutura da Dialog Skill.
+Resultado local verificado em 13/09/2026: **42 testes aprovados com Python 3.14.0**, lint aprovado com ESLint 10.10.0 e build de produção aprovado com Vite 8.3.0. A suíte cobre o contrato da API, validações, contexto e sessões, normalização das respostas e estrutura da Dialog Skill. Em 14/09/2026, com o IR ALÉM 1, a suíte passou a **116 testes aprovados com Python 3.11.9**: 51 unitários do extrator (prompt, parsing, mock, provedores e caminho real com cliente falso) e 23 de integração das rotas `/api/extract` e `/api/chat/clinical`, todos sem rede e sem chave.
 
 O smoke test real foi concluído em 13/09/2026 com uma instância IBM Watson Assistant Classic/Lite, Dialog Skill **CardioIA Acolhe** e API V1. A jornada React → Flask → Watson verificou explicitamente:
 
@@ -332,6 +379,8 @@ Todos os cenários empregaram exclusivamente frases fictícias, sem dados pessoa
 
 ## 🗃 Histórico de lançamentos
 
+- **0.2.0 — 14/09/2026**
+  - IR ALÉM 1: extrator clínico com IA generativa (`clinical_extractor.py`), rotas `/api/extract` e `/api/chat/clinical`, modo de simulação sem chave, demo, 74 testes novos e documento PDF.
 - **0.1.0 — 12/09/2026**
   - Primeira versão do assistente, da interface, dos testes automatizados e da documentação acadêmica.
   - Integração real com o IBM Watson Assistant V1 verificada em 13/09/2026.
