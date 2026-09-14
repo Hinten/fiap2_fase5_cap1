@@ -2,4 +2,5 @@ Flask==3.1.2
 ibm-watson==11.2.0
 python-dotenv==1.2.3
 pytest==8.4.2
-
+openai==3.13.0
+reportlab==4.0.9

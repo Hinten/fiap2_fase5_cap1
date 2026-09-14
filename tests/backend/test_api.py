@@ -5,6 +5,7 @@ from typing import Any
 import pytest
 
 from src.backend import create_app
+from src.backend.clinical_extractor import MockClinicalExtractor
 from src.backend.watson_gateway import WatsonServiceError
 
 
@@ -45,7 +46,7 @@ def gateway() -> FakeGateway:
 
 @pytest.fixture
 def client(gateway: FakeGateway):
-    app = create_app({"TESTING": True}, gateway=gateway)
+    app = create_app({"TESTING": True}, gateway=gateway, extractor=MockClinicalExtractor())
     return app.test_client()
 
 
@@ -57,6 +58,7 @@ def test_health_reports_configuration_without_exposing_credentials(client):
         "status": "ok",
         "service": "cardioia-api",
         "watson": {"configured": True},
+        "clinical": {"mode": "mock", "provider": "mock", "model": "mock"},
     }
     assert "key" not in response.get_data(as_text=True).lower()
 

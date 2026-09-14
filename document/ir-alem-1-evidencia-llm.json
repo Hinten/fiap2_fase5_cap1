@@ -1,0 +1,157 @@
+{
+  "mode": "llm",
+  "provider": "google",
+  "model": "gemini-3.5-flash",
+  "date": "2026-09-14",
+  "scenarios": [
+    {
+      "title": "Emergência (dor torácica)",
+      "input": "Acordei ontem à noite com uma dor forte no peito, tipo um aperto. Suei muito frio. Durou uns 30 minutos e achei que ia morrer.",
+      "output": {
+        "symptom": "dor forte no peito em aperto e suor frio",
+        "intensity": 9,
+        "duration": "aproximadamente 30 minutos",
+        "context": "ao acordar ontem à noite, com sensação de morte iminente",
+        "alert_severity": "critical",
+        "confidence": 0.98,
+        "entities": [
+          {
+            "value": "dor forte no peito",
+            "type": "symptom",
+            "confidence": 0.98,
+            "normalized": "dor torácica"
+          },
+          {
+            "value": "aperto",
+            "type": "symptom",
+            "confidence": 0.95,
+            "normalized": "dor em aperto"
+          },
+          {
+            "value": "Suei muito frio",
+            "type": "symptom",
+            "confidence": 0.97,
+            "normalized": "sudorese fria"
+          },
+          {
+            "value": "30 minutos",
+            "type": "duration",
+            "confidence": 0.95,
+            "normalized": null
+          },
+          {
+            "value": "achei que ia morrer",
+            "type": "symptom",
+            "confidence": 0.92,
+            "normalized": "sensação de morte iminente"
+          },
+          {
+            "value": "ontem à noite",
+            "type": "context",
+            "confidence": 0.9,
+            "normalized": null
+          }
+        ],
+        "reasoning": "O relato descreve dor torácica de forte intensidade em aperto, associada a sudorese fria e sensação de morte iminente, o que configura um quadro de alta suspeita para emergência cardiovascular (infarto agudo do miocárdio)."
+      }
+    },
+    {
+      "title": "Alerta alto (falta de ar ao esforço)",
+      "input": "Quando subo escadas ou corro fico muito ofegante. Demora uns 10 minutos pra respiração voltar ao normal. Nunca tive isso antes.",
+      "output": {
+        "symptom": "falta de ar ao esforço",
+        "intensity": 7,
+        "duration": "10 minutos",
+        "context": "ao subir escadas ou correr",
+        "alert_severity": "high",
+        "confidence": 0.95,
+        "entities": [
+          {
+            "value": "ofegante",
+            "type": "symptom",
+            "confidence": 0.96,
+            "normalized": "dispneia"
+          },
+          {
+            "value": "subo escadas",
+            "type": "context",
+            "confidence": 0.92,
+            "normalized": "esforço físico"
+          },
+          {
+            "value": "corro",
+            "type": "context",
+            "confidence": 0.92,
+            "normalized": "esforço físico"
+          },
+          {
+            "value": "10 minutos",
+            "type": "duration",
+            "confidence": 0.95,
+            "normalized": null
+          },
+          {
+            "value": "Nunca tive isso antes",
+            "type": "context",
+            "confidence": 0.88,
+            "normalized": "sintoma de início recente"
+          }
+        ],
+        "reasoning": "O paciente relata dispneia (ofegante) desencadeada por esforço físico moderado a intenso (subir escadas e correr), com duração de 10 minutos para recuperação. Por se tratar de falta de ar ao esforço de início recente, a severidade é classificada como 'high'."
+      }
+    },
+    {
+      "title": "Moderado (palpitações recorrentes)",
+      "input": "Sinto palpitações de vez em quando, principalmente à noite. Duram uns 2-3 minutos e passam sozinhas. Tem umas 2 semanas. Tomo losartana todo dia.",
+      "output": {
+        "symptom": "palpitações",
+        "intensity": 4,
+        "duration": "2 a 3 minutos por episódio, há 2 semanas",
+        "context": "à noite, episódios recorrentes que passam sozinhos",
+        "alert_severity": "moderate",
+        "confidence": 0.95,
+        "entities": [
+          {
+            "value": "palpitações",
+            "type": "symptom",
+            "confidence": 0.98,
+            "normalized": "palpitação"
+          },
+          {
+            "value": "2-3 minutos",
+            "type": "duration",
+            "confidence": 0.95,
+            "normalized": "2 a 3 minutos"
+          },
+          {
+            "value": "2 semanas",
+            "type": "duration",
+            "confidence": 0.95,
+            "normalized": "14 dias"
+          },
+          {
+            "value": "losartana",
+            "type": "medication",
+            "confidence": 0.98,
+            "normalized": "losartana"
+          }
+        ],
+        "reasoning": "Palpitações recorrentes e autolimitadas, sem outros sintomas de gravidade associados. Paciente faz uso de anti-hipertensivo (losartana)."
+      }
+    },
+    {
+      "title": "Sem sintoma (pergunta educativa)",
+      "input": "Oi! Quais alimentos ajudam a cuidar do coração?",
+      "output": {
+        "symptom": "nenhum sintoma relatado",
+        "intensity": 0,
+        "duration": "não informado",
+        "context": "pergunta educativa sobre alimentação",
+        "alert_severity": "info",
+        "confidence": 0.95,
+        "entities": [],
+        "reasoning": "A mensagem é uma pergunta geral sobre alimentação saudável para o coração; não há sintomas relatados."
+      }
+    }
+  ]
+}
