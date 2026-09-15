@@ -88,9 +88,6 @@ O [IR ALÉM 2](#ir-alem-2) acrescenta um **fluxo de automação robótica de pro
   <sub>Interface responsiva conectada — 390 × 844 px</sub>
 </p>
 
-> [!NOTE]
-> As capturas registram o estado inicial real com **Configuração pronta** no desktop e **Pronto** no mobile. Para não expor dados pessoais nem transformar uma conversa clínica em conteúdo público, as imagens não contêm mensagens de teste; os cenários verificados no smoke test estão descritos na seção [Testes e qualidade](#qualidade).
-
 <a id="aderencia"></a>
 
 ## 🎯 Aderência ao enunciado
