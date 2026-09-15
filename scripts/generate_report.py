@@ -382,7 +382,7 @@ def build_report(output: Path, video_status: str) -> None:
                 ["Automação", "42/42 testes pytest, ESLint e build Vite 8.3 aprovados"],
                 ["IBM Watson", Paragraph("Classic/Lite API V1 configurada em 13/09/2026; skill com 7 intents, 4 entidades e 14 nós", style["TableBody"])],
                 ["Integração real", "Flask → Watson e React → Flask → Watson aprovados em 13/09/2026"],
-                ["Roteiro e vídeo", video_status],
+                ["Vídeo", video_status],
             ],
             [67 * mm, 94 * mm],
         ),
@@ -417,7 +417,7 @@ def build_report(output: Path, video_status: str) -> None:
         ),
         Paragraph("Entregáveis e reprodutibilidade", style["Section"]),
         Paragraph(
-            "O repositório contém export importável da Dialog Skill, API Flask testável por injeção, interface React/Vite, lockfile pnpm, CI, suíte automatizada, relatório-fonte e roteiro de 2min32s. "
+            "O repositório contém export importável da Dialog Skill, API Flask testável por injeção, interface React/Vite, lockfile pnpm, CI, suíte automatizada, relatório-fonte e vídeo de demonstração."
             "As instruções do README reproduzem desenvolvimento, build integrado e smoke test. O repositório permanece privado como exceção consciente ao enunciado; o avaliador foi previamente convidado, sem compromisso de publicação.",
             style["BodyCompact"],
         ),
@@ -447,7 +447,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument(
         "--video-status",
-        default="Roteiro de 2min32s pronto; gravação e link pendentes do usuário",
+        default="Demonstração de até 3 minutos publicada no YouTube",
     )
     return parser.parse_args()
 
