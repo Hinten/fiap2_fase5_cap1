@@ -3,7 +3,6 @@
 ## Relatório técnico — Grupo 7
 
 **FIAP — Fase 5, Capítulo 1**  
-**Versão:** 0.1.0 — 13/09/2026
 
 ### 1. Objetivo
 
