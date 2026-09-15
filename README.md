@@ -103,13 +103,11 @@ Como desafio opcional, o [IR ALÉM 1](#ir-alem-1) adiciona um módulo de **IA ge
 | Export do assistente | [`cardioia-dialog.json`](config/watson/cardioia-dialog.json) | **Disponível** |
 | Relatório curto | [PDF](output/pdf/relatorio-cardioia.pdf) · [fonte em Markdown](document/relatorio-cardioia.md) | **Disponível — 2 páginas** |
 | Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; avaliador previamente convidado |
-| Vídeo de até 3 minutos | [Roteiro da demonstração](document/roteiro-video.md) | **Pendente de gravação e publicação** |
+| Vídeo de até 3 minutos | https://www.youtube.com/watch?v=ynFGrxRVwWA | **Pendente de gravação e publicação** |
 | Grupo de 4 a 5 integrantes — 1 ponto extra | Grupo 7 com cinco integrantes identificados acima | **Atende à formação recomendada** |
 | IR ALÉM 1 — código Python | [`clinical_extractor.py`](src/backend/clinical_extractor.py), rotas `/api/extract` e `/api/chat/clinical`, [demo](scripts/demo_clinical_extractor.py), 74 testes e [evidência real com Gemini](document/ir-alem-1-evidencia-llm.json) | **Implementado; execução real verificada em 14/09/2026** |
 | IR ALÉM 1 — documento PDF | [PDF](output/pdf/ir-alem-1-extracao-clinica.pdf) · [fonte em Markdown](document/ir-alem-1-extracao-clinica.md) | **Disponível — 4 páginas** |
 
-> [!WARNING]
-> Antes da entrega, ainda é necessário gravar e publicar o vídeo. O repositório permanece privado por decisão do grupo, com o avaliador previamente convidado, e o relatório PDF já registra a integração real e os testes aprovados. Dos desafios opcionais, o IR ALÉM 1 está entregue; o IR ALÉM 2 não faz parte do escopo desta versão.
 
 <a id="como-funciona"></a>
 
