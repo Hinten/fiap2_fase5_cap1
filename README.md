@@ -102,7 +102,6 @@ O [IR ALÉM 2](#ir-alem-2) acrescenta um **fluxo de automação robótica de pro
 | Backend Python | [`src/backend`](src/backend) | **Disponível** |
 | Export do assistente | [`cardioia-dialog.json`](config/watson/cardioia-dialog.json) | **Disponível** |
 | Relatório curto | [PDF](output/pdf/relatorio-cardioia.pdf) · [fonte em Markdown](document/relatorio-cardioia.md) | **Disponível — 2 páginas** |
-| Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; avaliador previamente convidado |
 | Vídeo de até 3 minutos | [Demonstração no YouTube](https://www.youtube.com/watch?v=ynFGrxRVwWA) | **Publicado** |
 | Grupo de 4 a 5 integrantes — 1 ponto extra | Grupo 7 com cinco integrantes identificados acima | **Atende à formação recomendada** |
 | IR ALÉM 1 — código Python | [`clinical_extractor.py`](src/backend/clinical_extractor.py), rotas `/api/extract` e `/api/chat/clinical`, [demo](scripts/demo_clinical_extractor.py), 74 testes e [evidência real com Gemini](document/ir-alem-1-evidencia-llm.json) | **Implementado; execução real verificada em 14/09/2026** |
