@@ -54,6 +54,7 @@
 - [Estrutura de pastas](#estrutura)
 - [Configuração do Watson Assistant](#configuracao)
 - [IR ALÉM 1 — extração clínica com IA generativa](#ir-alem-1)
+- [IR ALÉM 2 — automação inteligente com RPA, IA e dados híbridos](#ir-alem-2)
 - [Como executar o código](#execucao)
 - [Testes e qualidade](#qualidade)
 - [Histórico de lançamentos](#historico)
@@ -68,6 +69,8 @@ O **CardioIA Acolhe** é um assistente conversacional educativo que ajuda uma pe
 O processamento de linguagem natural do fluxo principal utiliza uma **Dialog Skill do IBM Watson Assistant**, sem IA generativa. A skill em português brasileiro reúne intents, entidades, sinônimos, variáveis de contexto, um nó de emergência prioritário e fallback final. O backend Flask protege as credenciais e normaliza as respostas; a interface web baseada em HTML, React e Vite oferece histórico, sugestões, estados de carregamento e erro, reinício da conversa, alerta de urgência e detalhes de NLP.
 
 Como desafio opcional, o [IR ALÉM 1](#ir-alem-1) adiciona um módulo de **IA generativa** que transforma relatos clínicos em texto livre em JSON estruturado (sintoma, intensidade, duração, contexto, entidades, nível de alerta e confiança), usando system prompt, few-shot, chain-of-thought e JSON mode, com validação e modo de simulação sem chave.
+
+O [IR ALÉM 2](#ir-alem-2) acrescenta um **fluxo de automação robótica de processos (RPA)**: um simulador gera dados clínicos fictícios em **PostgreSQL**, um robô Python os lê periodicamente e aplica **Isolation Forest** para detectar anomalias, alertas e eventos ficam registrados em trilha de auditoria e as mensagens enviadas pelo Watson Assistant são preservadas em **MongoDB**.
 
 <a id="interface"></a>
 
@@ -103,11 +106,13 @@ Como desafio opcional, o [IR ALÉM 1](#ir-alem-1) adiciona um módulo de **IA ge
 | Export do assistente | [`cardioia-dialog.json`](config/watson/cardioia-dialog.json) | **Disponível** |
 | Relatório curto | [PDF](output/pdf/relatorio-cardioia.pdf) · [fonte em Markdown](document/relatorio-cardioia.md) | **Disponível — 2 páginas** |
 | Repositório GitHub público | Repositório do projeto | **Exceção consciente:** mantido privado; avaliador previamente convidado |
-| Vídeo de até 3 minutos | https://www.youtube.com/watch?v=ynFGrxRVwWA | **Pendente de gravação e publicação** |
+| Vídeo de até 3 minutos | [Demonstração no YouTube](https://www.youtube.com/watch?v=ynFGrxRVwWA) | **Publicado** |
 | Grupo de 4 a 5 integrantes — 1 ponto extra | Grupo 7 com cinco integrantes identificados acima | **Atende à formação recomendada** |
 | IR ALÉM 1 — código Python | [`clinical_extractor.py`](src/backend/clinical_extractor.py), rotas `/api/extract` e `/api/chat/clinical`, [demo](scripts/demo_clinical_extractor.py), 74 testes e [evidência real com Gemini](document/ir-alem-1-evidencia-llm.json) | **Implementado; execução real verificada em 14/09/2026** |
 | IR ALÉM 1 — documento PDF | [PDF](output/pdf/ir-alem-1-extracao-clinica.pdf) · [fonte em Markdown](document/ir-alem-1-extracao-clinica.md) | **Disponível — 4 páginas** |
-
+| IR ALÉM 2 — código da automação (Python) | [`simulador.py`](src/backend/simulador.py), [`rpa_ia.py`](src/backend/rpa_ia.py) e [`api_watson.py`](src/backend/api_watson.py) | **Implementado** |
+| IR ALÉM 2 — estrutura dos bancos | PostgreSQL em [`setup_banco.sql`](config/SQL/setup_banco.sql); MongoDB `doctor_in.logs_watson` descrito no relatório | **Disponível** |
+| IR ALÉM 2 — relatório técnico | [`ir-alem-2-automacao-rpa.md`](document/ir-alem-2-automacao-rpa.md) | **Disponível** |
 
 <a id="como-funciona"></a>
 
@@ -214,12 +219,14 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 .
 ├── .github/                  # arquivos de apoio à qualidade do repositório
 ├── assets/                   # marca e capturas de tela da documentação
-├── config/watson/            # export versionado da Dialog Skill
-├── document/                 # relatório técnico, documento do IR ALÉM 1 e roteiro da demonstração
+├── config/
+│   ├── SQL/                  # esquema PostgreSQL do fluxo RPA (IR ALÉM 2)
+│   └── watson/               # export versionado da Dialog Skill
+├── document/                 # relatório técnico e documentos do IR ALÉM 1 e do IR ALÉM 2
 ├── output/pdf/               # relatório técnico e documento do IR ALÉM 1 em PDF
 ├── scripts/                  # validação, preparação, demo do IR ALÉM 1 e geração de entregáveis
 ├── src/
-│   ├── backend/              # API Flask, gateway do Watson Assistant e extrator clínico (IR ALÉM 1)
+│   ├── backend/              # API Flask, gateway do Watson, extrator clínico (IR ALÉM 1), simulador, robô RPA e webhook (IR ALÉM 2)
 │   └── frontend/             # interface React/Vite
 ├── tests/backend/            # testes da API, gateway, export do Watson e extração clínica
 ├── .env.example              # modelo de configuração, sem credenciais
@@ -285,6 +292,64 @@ Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/api/extract -ContentTy
 
 > [!NOTE]
 > O extrator não diagnostica nem prescreve: apenas organiza o que foi relatado. A orientação de emergência (SAMU 192) é decidida pelo backend a partir do nível de alerta. Nenhum texto clínico, resposta do modelo ou credencial é registrado em log.
+
+<a id="ir-alem-2"></a>
+
+## 🤖 IR ALÉM 2 — automação inteligente com RPA, IA e dados híbridos
+
+O IR ALÉM 2 simula um robô que **monitora dados clínicos estruturados**, **identifica anomalias com IA** e **registra alertas de forma rastreável**, combinando um banco relacional e um não relacional. O fluxo completo, as decisões de projeto e a estrutura dos bancos estão no [relatório técnico](document/ir-alem-2-automacao-rpa.md).
+
+```mermaid
+flowchart LR
+    S[Simulador de entradas] -->|triagens e checkups| P[(PostgreSQL<br/>banco_clinico)]
+    P -->|medições pendentes| R[Robô RPA + IsolationForest]
+    R -->|anomalia, status e auditoria| P
+    W[IBM Watson Assistant] -->|webhook de nó| H[API Flask /webhook]
+    H -->|payload + data e hora| M[(MongoDB<br/>doctor_in.logs_watson)]
+
+    classDef app fill:#dff5f2,stroke:#0b706f,color:#064e4d
+    classDef data fill:#fff4e5,stroke:#b45309,color:#78350f
+    classDef external fill:#e8efff,stroke:#2563eb,color:#1e3a8a
+    class S,R,H app
+    class P,M data
+    class W external
+```
+
+| Componente | Arquivo | Papel |
+|---|---|---|
+| Simulador de entradas | [`src/backend/simulador.py`](src/backend/simulador.py) | A cada 5 s cria uma triagem (80% normal, 20% de risco) e a cada 30 s gera checkups dos pacientes admitidos, simulando a normalização dos sinais. |
+| Robô RPA + IA | [`src/backend/rpa_ia.py`](src/backend/rpa_ia.py) | A cada 3 s lê as medições ainda não avaliadas, aplica `IsolationForest` e, diante de anomalia na triagem, admite o paciente e registra um alerta. |
+| Webhook do Watson | [`src/backend/api_watson.py`](src/backend/api_watson.py) | Recebe o payload de um nó do Watson Assistant e grava o documento, com data e hora de recebimento, no MongoDB. |
+| Esquema relacional | [`config/SQL/setup_banco.sql`](config/SQL/setup_banco.sql) | Tabelas `pacientes`, `medicoes` e `logs_auditoria`, com base inicial de normalidade. |
+
+O paciente simulado percorre o ciclo **triado → admitido → alta**: a IA admite quem apresenta leitura anômala na triagem, e a alta ocorre após três checkups avaliados como normais.
+
+| Requisito do enunciado | Como é atendido |
+|---|---|
+| Ler periodicamente dados clínicos em banco relacional | O robô consulta no PostgreSQL as medições com `anomalia_detectada` nula — pressão arterial, frequência cardíaca e adesão ao tratamento. |
+| Banco não relacional para mensagens e metadados | O MongoDB (`doctor_in.logs_watson`) armazena os payloads enviados pelo Watson Assistant, sem esquema fixo. |
+| Técnica de IA para identificar anomalias | `IsolationForest` (`contamination=0.15`, `random_state=42`) sobre os quatro sinais, usando o histórico normal como referência. |
+| Alertas e eventos rastreáveis | `logs_auditoria` registra nível (`INFO`, `ALERTA`, `ALTA`), evento, paciente, medição de origem e data e hora de cada ação. |
+
+<details>
+<summary><strong>Como executar o IR ALÉM 2</strong></summary>
+
+Pré-requisitos: Python 3.11+, PostgreSQL e MongoDB locais. O código se conecta a `postgresql://postgres:123@localhost/banco_clinico` e a `mongodb://localhost:27017/`.
+
+```powershell
+python -m pip install pandas sqlalchemy psycopg2-binary scikit-learn schedule pymongo flask
+
+psql -U postgres -c "CREATE DATABASE banco_clinico;"
+psql -U postgres -d banco_clinico -f config/SQL/setup_banco.sql
+
+# Em terminais separados, na raiz do projeto
+python src/backend/simulador.py     # triagens e checkups
+python src/backend/rpa_ia.py        # robô RPA com detecção de anomalias
+python src/backend/api_watson.py    # webhook em http://127.0.0.1:5000/webhook
+```
+
+O webhook usa a porta 5000, a mesma da API principal do assistente; execute-os em momentos diferentes. Para que o Watson Assistant o chame, configure no nó desejado um webhook `POST` para a URL pública do endpoint `/webhook`.
+</details>
 
 <a id="execucao"></a>
 
@@ -377,6 +442,9 @@ Todos os cenários empregaram exclusivamente frases fictícias, sem dados pessoa
 
 ## 🗃 Histórico de lançamentos
 
+- **0.3.0 — 15/09/2026**
+  - IR ALÉM 2: simulador clínico, robô RPA com `IsolationForest`, PostgreSQL para dados clínicos e auditoria, webhook do Watson com MongoDB e relatório técnico.
+  - Vídeo de demonstração publicado no [YouTube](https://www.youtube.com/watch?v=ynFGrxRVwWA).
 - **0.2.0 — 14/09/2026**
   - IR ALÉM 1: extrator clínico com IA generativa (`clinical_extractor.py`), rotas `/api/extract` e `/api/chat/clinical`, modo de simulação sem chave, demo, 74 testes novos e documento PDF.
 - **0.1.0 — 12/09/2026**

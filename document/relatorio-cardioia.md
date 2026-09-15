@@ -48,7 +48,7 @@ A qualidade foi verificada em quatro camadas. Testes estruturais examinaram o JS
 | IBM Watson | Serviço Classic/Lite e Dialog Skill disponíveis | API V1 configurada em 13/09/2026; 7 intents, 4 entidades e 14 nós |
 | Smoke Flask → Watson | Chamada real processada pela Dialog Skill | Aprovado |
 | Smoke React → Flask → Watson | Jornada completa funciona de ponta a ponta | Aprovado em 13/09/2026 |
-| Vídeo | Roteiro com duração-alvo de 2min32s | PENDENTES a gravação e o link pelo usuário |
+| Vídeo | Demonstração de até 3 minutos | Publicado no [YouTube](https://www.youtube.com/watch?v=ynFGrxRVwWA) |
 
 No smoke real da interface, foram verificadas explicitamente as seguintes evidências:
 
@@ -63,7 +63,7 @@ No smoke real da interface, foram verificadas explicitamente as seguintes evidê
 9. fallback para pergunta fora do escopo;
 10. responsividade na viewport de 390 × 844 px.
 
-A integração real com o Watson está confirmada. A gravação e o link do vídeo permanecem pendentes como etapa separada da validação técnica.
+A integração real com o Watson está confirmada e o vídeo de demonstração foi publicado.
 
 ### Referências
 

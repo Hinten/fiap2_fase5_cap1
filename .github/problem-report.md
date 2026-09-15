@@ -9,7 +9,7 @@ Este documento registra bloqueios, decisões e evidências que exigem acompanham
 | Configuração do IBM Watson Assistant | Concluído | Assistant **CardioIA Acolhe** e Dialog Skill configurados no IBM Watson Assistant Classic/Lite; integração pela API V1 validada em 13/09/2026. | Equipe |
 | Credenciais locais | Concluído | Credenciais usadas somente no ambiente local de validação, sem envio pelo chat ou versionamento. | Usuário |
 | PDF do relatório | Concluído | PDF A4 de 2 páginas gerado e ambas as páginas verificadas visualmente. | Equipe |
-| Vídeo | Pendente | Gravar, publicar e inserir o link no README e no roteiro. | Usuário |
+| Vídeo | Concluído | Vídeo publicado no [YouTube](https://www.youtube.com/watch?v=ynFGrxRVwWA) e link inserido no README. | Usuário |
 | Testes locais | Concluído | 42 testes Python, lint e build aprovados em 13/09/2026. | Equipe |
 | Smoke test final | Concluído | Jornada real React → Flask → Watson aprovada em 13/09/2026: `loading`, envio por botão e Enter, erro seguro, reset, alerta com `urgent`, detalhes de NLP, fluxo normal em 3 turnos, fallback e viewport 390 × 844. | Equipe |
 | Avaliação independente | Em andamento | Avaliação 1 concluída e achados documentais incorporados nesta revisão; repetir a avaliação até 10/10 ou três ciclos. | Equipe |
